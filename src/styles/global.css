@@ -1,11 +1,12 @@
 /* ===== CSS Variables ===== */
 :root {
-  --brand: #c0392b;
-  --brand-dark: #922b21;
-  --brand-light: #fdecea;
-  --brand-50: #fff5f5;
+  --brand: #BA0C2F;
+  --brand-dark: #7A0A22;
+  --brand-light: rgba(186,12,47,.08);
+  --brand-50: rgba(186,12,47,.04);
+  --brand-glow: rgba(186,12,47,.22);
 
-  --track-1: #c0392b;
+  --track-1: #BA0C2F;
   --track-2: #2563eb;
   --track-3: #059669;
 

@@ -1,31 +1,22 @@
 <template>
-  <section id="timeline" class="section section--alt">
-    <div class="container">
-      <div class="section-header">
-        <span class="eyebrow">{{ t('timeline.eyebrow') }}</span>
-        <h2>{{ t('timeline.title') }}</h2>
+  <section id="timeline" class="timeline-section">
+    <div class="wrap">
+      <div class="h-block reveal">
+        <div class="eyebrow">{{ t('timeline.eyebrow') }}</div>
+        <h2>{{ t('timeline.h2pre') }} <span class="accent">{{ t('timeline.h2suf') }}</span></h2>
       </div>
 
       <div class="timeline">
         <div
-          v-for="(item, i) in items"
-          :key="i"
-          class="timeline-item"
-          :class="{ 'timeline-item--active': item.status === 'active', 'visible': visibleItems.has(i) }"
+          v-for="(item, i) in items" :key="i"
+          class="tl-item reveal"
+          :class="{ 'tl-item--active': item.status === 'active' }"
           :ref="(el) => setRef(el, i)"
         >
-          <div class="timeline-item__left">
-            <div class="timeline-item__dot">
-              <span v-if="item.status === 'active'" class="dot-pulse"></span>
-            </div>
-            <div v-if="i < items.length - 1" class="timeline-item__line"></div>
-          </div>
-          <div class="timeline-item__card">
-            <span class="timeline-item__date">{{ item.date }}</span>
-            <h3>{{ item.title }}</h3>
-            <p>{{ item.desc }}</p>
-            <span v-if="item.status === 'active'" class="status-badge status-badge--active">{{ t('timeline.soon') }}</span>
-          </div>
+          <div class="tl-item__date">{{ item.date }}</div>
+          <div class="tl-item__title">{{ item.title }}</div>
+          <div class="tl-item__desc">{{ item.desc }}</div>
+          <span v-if="item.status === 'active'" class="tl-badge">{{ t('timeline.soon') }}</span>
         </div>
       </div>
     </div>
@@ -43,63 +34,103 @@ const items = computed(() =>
   tm('timeline.items').map((item, i) => ({ ...item, status: rawTimeline[i]?.status ?? 'upcoming' }))
 )
 
-const visibleItems = ref(new Set())
 const itemRefs = ref([])
 function setRef(el, i) { if (el) itemRefs.value[i] = el }
 
 let observer = null
 onMounted(() => {
+  // h-block reveal
+  const io2 = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io2.unobserve(e.target) } })
+  }, { threshold: 0.12 })
+  document.querySelectorAll('#timeline .h-block.reveal').forEach(el => io2.observe(el))
+
+  // timeline items
   observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        const idx = parseInt(entry.target.dataset.idx)
-        setTimeout(() => { visibleItems.value = new Set([...visibleItems.value, idx]) }, idx * 120)
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const idx = parseInt(e.target.dataset.idx)
+        setTimeout(() => e.target.classList.add('in'), idx * 100)
+        observer.unobserve(e.target)
       }
     })
-  }, { threshold: 0.2 })
+  }, { threshold: 0.15 })
   itemRefs.value.forEach((el, i) => { if (el) { el.dataset.idx = i; observer.observe(el) } })
 })
 onUnmounted(() => { if (observer) observer.disconnect() })
 </script>
 
 <style scoped>
-.timeline { max-width: 680px; margin: 0 auto; }
-
-.timeline-item {
-  display: flex; gap: 20px;
-  opacity: 0; transform: translateY(20px);
-  transition: opacity 450ms ease, transform 450ms ease;
+.timeline-section {
+  background: #fff;
+  padding: 120px 24px 160px;
+  border-top: 1px solid rgba(0,0,0,.04);
 }
-.timeline-item.visible { opacity: 1; transform: none; }
+.wrap { max-width: 1120px; margin: 0 auto; }
 
-.timeline-item__left { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 20px; }
-
-.timeline-item__dot {
-  position: relative; width: 16px; height: 16px; border-radius: 50%;
-  background: var(--gray-300); border: 3px solid var(--bg-alt);
-  box-shadow: 0 0 0 2px var(--gray-300); flex-shrink: 0; margin-top: 4px;
+.h-block { text-align: center; margin-bottom: 72px; }
+.h-block h2 {
+  font-size: clamp(32px, 4.4vw, 52px);
+  font-weight: 700; line-height: 1.1;
+  margin-top: 8px; letter-spacing: -.02em; color: var(--gray-900);
 }
-.timeline-item--active .timeline-item__dot { background: var(--brand); box-shadow: 0 0 0 3px rgba(192,57,43,0.2); }
-
-.dot-pulse {
-  position: absolute; inset: -4px; border-radius: 50%;
-  background: rgba(192,57,43,0.25); animation: pulse 2s infinite;
+.accent {
+  background: linear-gradient(180deg, #BA0C2F 0%, #7A0A22 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
 }
-@keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(2.2); opacity: 0; } }
 
-.timeline-item__line { flex: 1; width: 2px; background: var(--border); margin: 6px 0 0; min-height: 32px; }
-
-.timeline-item__card {
-  flex: 1; padding: 18px 22px; margin-bottom: 20px;
-  background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+.timeline {
+  position: relative;
+  max-width: 840px;
+  margin: 0 auto;
+  padding-left: 32px;
 }
-.timeline-item--active .timeline-item__card { border-color: rgba(192,57,43,0.25); box-shadow: 0 0 0 3px rgba(192,57,43,0.06), var(--shadow-md); }
+.timeline::before {
+  content: "";
+  position: absolute; left: 8px; top: 8px; bottom: 8px; width: 1px;
+  background: linear-gradient(180deg, var(--brand), #7A0A22, rgba(186,12,47,.1));
+}
 
-.timeline-item__date { display: block; font-size: 12px; font-weight: 700; color: var(--gray-400); letter-spacing: 0.04em; margin-bottom: 6px; }
-.timeline-item--active .timeline-item__date { color: var(--brand); }
-.timeline-item__card h3 { font-size: 16px; font-weight: 700; color: var(--gray-900); margin-bottom: 6px; }
-.timeline-item__card p { font-size: 14px; color: var(--gray-600); line-height: 1.65; }
+.tl-item {
+  position: relative;
+  padding: 22px 0 22px 24px;
+}
+.tl-item::before {
+  content: "";
+  position: absolute; left: -30px; top: 30px;
+  width: 13px; height: 13px; border-radius: 50%;
+  background: #fff; border: 2px solid var(--brand);
+  box-shadow: 0 0 0 4px rgba(186,12,47,.10);
+}
+.tl-item--active::before {
+  background: var(--brand);
+  box-shadow: 0 0 16px rgba(186,12,47,.35), 0 0 0 4px rgba(186,12,47,.12);
+}
 
-.status-badge { display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; }
-.status-badge--active { background: var(--brand-light); color: var(--brand); }
+.tl-item__date {
+  font-size: 12px; color: var(--brand);
+  letter-spacing: .18em; font-weight: 600; text-transform: uppercase;
+}
+.tl-item__title {
+  margin-top: 6px; font-size: 20px;
+  color: var(--gray-900); font-weight: 600;
+}
+.tl-item__desc {
+  margin-top: 6px; color: var(--gray-500);
+  font-size: 14px; line-height: 1.7;
+}
+.tl-badge {
+  display: inline-block; margin-top: 10px;
+  font-size: 11px; font-weight: 700; letter-spacing: .06em;
+  text-transform: uppercase; padding: 3px 10px; border-radius: 999px;
+  background: rgba(186,12,47,.08); color: var(--brand);
+}
+
+/* 滚动渐现 */
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1); }
+.reveal.in { opacity: 1; transform: none; }
+
+@media (max-width: 880px) {
+  .timeline-section { padding: 80px 20px 100px; }
+}
 </style>

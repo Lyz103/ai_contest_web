@@ -1,121 +1,153 @@
 <template>
-  <section id="tracks" class="section">
-    <div class="container">
-      <div class="section-header">
-        <span class="eyebrow">{{ t('tracks.eyebrow') }}</span>
-        <h2>{{ t('tracks.title') }}</h2>
-        <p class="section-header__sub">{{ t('tracks.sub') }}</p>
+  <section id="tracks" class="tracks-section">
+    <div class="wrap">
+      <div class="h-block reveal">
+        <div class="eyebrow">{{ t('tracks.eyebrow') }}</div>
+        <h2><span class="accent">{{ t('tracks.h2pre') }}</span>{{ t('tracks.h2suf') }}</h2>
+        <p class="lead">{{ t('tracks.lead') }}</p>
       </div>
 
-      <div class="tracks-grid">
-        <article v-for="track in tracks" :key="track.id" class="track-card" :style="{ '--tc': track.color }">
-          <div class="track-card__header">
-            <div class="track-card__meta">
-              <span class="track-num">Track {{ String(track.id).padStart(2, '0') }}</span>
-              <span class="track-mode">{{ t(`tracks.t${track.id}mode` in $tm('tracks') ? `tracks.t${track.id}mode` : 'tracks.mode') }}</span>
-            </div>
-            <h3 class="track-card__title">{{ t(`tracks.t${track.id}name`) }}</h3>
+      <div class="tracks reveal">
+        <div v-for="track in tracks" :key="track.id" class="track">
+          <div class="track__num">TRACK / {{ String(track.id).padStart(2, '0') }}</div>
+          <h3 class="track__title">{{ t(`tracks.t${track.id}name`) }}</h3>
+          <span class="track__tag">{{ t(track.modeKey) }}{{ track.platformKey ? ' · ' + t(track.platformKey) : '' }}</span>
+          <p class="track__desc">{{ t(`tracks.t${track.id}desc`) }}</p>
+          <div class="track__tags">
+            <span v-for="tag in tm(`tracks.t${track.id}tags`)" :key="tag" class="track__chip">{{ tag }}</span>
           </div>
-
-          <p class="track-card__desc">{{ t(`tracks.t${track.id}desc`) }}</p>
-
-          <div class="track-card__tags">
-            <span v-for="tag in tm(`tracks.t${track.id}tags`)" :key="tag" class="tag">{{ tag }}</span>
-          </div>
-
-          <div class="track-card__footer">
-            <div class="footer-row">
-              <span class="footer-label">{{ t('tracks.criteria') }}</span>
-              <div class="criteria-list">
-                <span v-for="c in tm(`tracks.t${track.id}criteria`)" :key="c" class="criteria-item">{{ c }}</span>
-              </div>
-            </div>
-            <div class="footer-row footer-row--inline">
-              <div v-if="track.platform" class="footer-item">
-                <span class="footer-label">{{ t('tracks.platform') }}</span>
-                <span class="footer-value">{{ track.platform }}</span>
-              </div>
-              <div class="footer-item">
-                <span class="footer-label">{{ t('tracks.finalists') }}</span>
-                <span class="footer-value footer-value--accent">{{ track.finalists }} {{ t('tracks.finalistsUnit') }}</span>
-              </div>
-            </div>
-          </div>
-        </article>
-      </div>
-
-      <div class="tracks-note">
-        <span class="note-icon">{{ t('tracks.noteIcon') }}</span>
-        <p>{{ t('tracks.note') }}</p>
+        </div>
       </div>
     </div>
   </section>
 </template>
 
 <script setup>
+import { onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { tracks } from '../data/contestData.js'
 const { t, tm } = useI18n()
+
+onMounted(() => {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target) } })
+  }, { threshold: 0.12 })
+  document.querySelectorAll('#tracks .reveal').forEach(el => io.observe(el))
+})
 </script>
 
 <style scoped>
-.section-header__sub { margin-top: 10px; font-size: 15px; color: var(--gray-500); }
-.tracks-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-
-.track-card {
-  border: 1px solid var(--border); border-radius: var(--radius-lg);
-  background: #fff; display: flex; flex-direction: column; gap: 0;
-  overflow: hidden; box-shadow: var(--shadow-sm);
-  transition: transform 240ms ease, box-shadow 240ms ease;
+.tracks-section {
+  background: var(--gray-50);
+  padding: 120px 24px;
 }
-.track-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px -8px rgba(0,0,0,0.12), 0 8px 16px -4px rgba(0,0,0,0.06); }
+.wrap { max-width: 1120px; margin: 0 auto; }
 
-.track-card__header {
-  padding: 24px 24px 20px;
-  background: linear-gradient(160deg, color-mix(in srgb, var(--tc) 8%, #fff) 0%, #fff 100%);
-  border-bottom: 1px solid color-mix(in srgb, var(--tc) 12%, var(--border));
-  display: flex; flex-direction: column; gap: 12px; position: relative;
+.h-block { text-align: center; margin-bottom: 72px; }
+.h-block h2 {
+  font-size: clamp(32px, 4.4vw, 52px);
+  font-weight: 700;
+  line-height: 1.1;
+  margin-top: 8px;
+  letter-spacing: -.02em;
+  color: var(--gray-900);
 }
-.track-card__header::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
-  background: var(--tc); transition: height 240ms ease;
+.accent {
+  background: linear-gradient(180deg, #BA0C2F 0%, #7A0A22 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
 }
-.track-card:hover .track-card__header::before { height: 6px; }
-
-.track-card__meta { display: flex; align-items: center; gap: 8px; }
-.track-num { font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--tc); }
-.track-mode { font-size: 11px; font-weight: 600; color: var(--gray-500); background: var(--gray-100); padding: 2px 8px; border-radius: 4px; }
-.track-card__title { font-size: 17px; font-weight: 800; color: var(--gray-900); line-height: 1.3; }
-
-.track-card__desc { padding: 18px 24px 0; font-size: 14px; color: var(--gray-600); line-height: 1.75; flex: 1; }
-
-.track-card__tags { padding: 14px 24px 0; display: flex; flex-wrap: wrap; gap: 6px; }
-.tag {
-  font-size: 12px; font-weight: 600; padding: 4px 11px; border-radius: 999px;
-  background: color-mix(in srgb, var(--tc) 9%, #fff);
-  color: var(--tc); border: 1px solid color-mix(in srgb, var(--tc) 18%, #fff);
+.lead {
+  max-width: 640px; margin: 16px auto 0;
+  color: var(--gray-500); font-size: 17px; line-height: 1.65;
+  white-space: nowrap;
+}
+@media (max-width: 900px) {
+  .lead { white-space: normal; }
 }
 
-.track-card__footer {
-  padding: 16px 24px 20px; margin-top: 16px;
-  border-top: 1px solid var(--gray-100); display: flex; flex-direction: column; gap: 12px;
+.tracks {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
 }
-.footer-row { display: flex; flex-direction: column; gap: 6px; }
-.footer-row--inline { flex-direction: row; gap: 20px; }
-.footer-item { display: flex; flex-direction: column; gap: 4px; }
-.footer-label { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray-400); }
-.footer-value { font-size: 13px; font-weight: 600; color: var(--gray-700); }
-.footer-value--accent { color: var(--tc); }
-.criteria-list { display: flex; flex-wrap: wrap; gap: 5px; }
-.criteria-item { font-size: 12px; padding: 3px 9px; background: var(--gray-100); border-radius: 4px; color: var(--gray-600); font-weight: 500; }
 
-.tracks-note {
-  margin-top: 28px; padding: 16px 22px;
-  background: var(--gray-50); border: 1px solid var(--border); border-radius: var(--radius-md);
-  display: flex; align-items: flex-start; gap: 12px;
+.track {
+  position: relative;
+  border-radius: 22px;
+  padding: 40px 30px;
+  background: #fff;
+  border: 1px solid var(--border);
+  transition: transform .5s cubic-bezier(.22,1,.36,1), box-shadow .5s cubic-bezier(.22,1,.36,1), border-color .5s;
+  min-height: 340px;
+  display: flex; flex-direction: column;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  overflow: hidden;
 }
-.note-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
-.tracks-note p { font-size: 14px; color: var(--gray-600); line-height: 1.7; margin: 0; }
+.track::before {
+  content: "";
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, #BA0C2F, #7A0A22);
+}
+.track:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 50px rgba(186,12,47,.12), 0 8px 20px rgba(0,0,0,.05);
+  border-color: rgba(186,12,47,.18);
+}
 
-@media (max-width: 1024px) { .tracks-grid { grid-template-columns: 1fr; max-width: 520px; margin: 0 auto; } }
+.track__num {
+  font-family: "SF Mono", ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--brand);
+  letter-spacing: .16em;
+  font-weight: 600;
+}
+.track__title {
+  margin-top: 14px;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--gray-900);
+  letter-spacing: -.01em;
+}
+.track__tag {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--brand);
+  padding: 5px 12px;
+  border: 1px solid rgba(186,12,47,.25);
+  border-radius: 999px;
+  display: inline-block;
+  background: rgba(186,12,47,.06);
+  font-weight: 500;
+  align-self: flex-start;
+}
+.track__desc {
+  margin-top: 20px;
+  color: var(--gray-500);
+  font-size: 14px;
+  line-height: 1.75;
+  flex: 1;
+}
+.track__tags {
+  margin-top: 20px;
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.track__chip {
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  background: var(--gray-100);
+  color: var(--gray-600);
+  font-weight: 500;
+}
+
+/* 滚动渐现 */
+.reveal { opacity: 0; transform: translateY(36px); transition: opacity .9s cubic-bezier(.22,1,.36,1), transform .9s cubic-bezier(.22,1,.36,1); }
+.reveal.in { opacity: 1; transform: none; }
+
+@media (max-width: 880px) {
+  .tracks-section { padding: 80px 20px; }
+  .tracks { grid-template-columns: 1fr; }
+  .track { min-height: auto; }
+}
 </style>

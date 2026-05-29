@@ -16,7 +16,6 @@
         <button class="lang-btn" @click="toggleLang">
           {{ locale === 'zh' ? 'EN' : '中' }}
         </button>
-        <RouterLink to="/contest" class="btn btn--primary btn--sm">{{ t('nav.register') }}</RouterLink>
         <button class="hamburger" :class="{ 'hamburger--open': menuOpen }" @click="menuOpen = !menuOpen" aria-label="菜单">
           <span></span><span></span><span></span>
         </button>
@@ -27,7 +26,6 @@
       <RouterLink v-for="link in navLinks" :key="link.to" :to="link.to" class="nav-link" @click="menuOpen = false">
         {{ t(link.key) }}
       </RouterLink>
-      <RouterLink to="/contest" class="btn btn--primary" @click="menuOpen = false">{{ t('nav.register') }}</RouterLink>
     </nav>
   </header>
 </template>
