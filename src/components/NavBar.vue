@@ -2,7 +2,7 @@
   <header class="navbar" :class="{ 'navbar--scrolled': scrolled }">
     <div class="navbar__inner">
       <RouterLink to="/" class="navbar__logo">
-        <img src="/yulan-logo.png" class="logo-img" alt="玉兰 Logo" />
+        <img :src="`${baseUrl}yulan-logo.png`" class="logo-img" alt="玉兰 Logo" />
         <span class="logo-text">{{ locale === 'en' ? 'AI Contest' : 'AI大赛' }}</span>
       </RouterLink>
 
@@ -35,6 +35,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t, locale } = useI18n()
+const baseUrl = import.meta.env.BASE_URL
 const scrolled = ref(false)
 const menuOpen = ref(false)
 

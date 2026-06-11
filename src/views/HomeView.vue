@@ -4,7 +4,7 @@
   <TracksSection />
   <TimelineSection />
   <PlatformsSection />
-  <OrgSubscribeSection />
+  <OrgSection />
 </template>
 
 <script setup>
@@ -13,5 +13,5 @@ import VideoSection from '../components/VideoSection.vue'
 import TracksSection from '../components/TracksSection.vue'
 import TimelineSection from '../components/TimelineSection.vue'
 import PlatformsSection from '../components/PlatformsSection.vue'
-import OrgSubscribeSection from '../components/OrgSubscribeSection.vue'
+import OrgSection from '../components/OrgSection.vue'
 </script>

@@ -10,7 +10,7 @@
       <div class="video-card">
         <video
           class="video-card__video"
-          src="/contest.mp4"
+          :src="`${baseUrl}contest.mp4`"
           controls
           playsinline
           preload="metadata"
@@ -23,6 +23,7 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
+const baseUrl = import.meta.env.BASE_URL
 </script>
 
 <style scoped>
