@@ -132,20 +132,6 @@
           </div>
         </div>
 
-        <!-- Awards -->
-        <div class="block block--awards">
-          <h3 class="block__title">
-            {{ t('contest.awardTitle') }}
-            <span class="block__total">{{ awardFor(track.id).totalPrize }}</span>
-          </h3>
-          <ul class="awards">
-            <li v-for="a in awardFor(track.id).awards" :key="a.rank" class="award">
-              <span class="award__rank">{{ a.rank }}</span>
-              <span class="award__count">×{{ a.count }}</span>
-              <span class="award__prize">{{ a.prize }}</span>
-            </li>
-          </ul>
-        </div>
       </div>
     </section>
   </div>
@@ -154,48 +140,79 @@
 <script setup>
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { tracks, awardDetails } from '../data/contestData.js'
+import { tracks } from '../data/contestData.js'
 
 const { t, tm } = useI18n()
 
 const active = ref(1)
-const awardFor = (id) => awardDetails.find(a => a.trackId === id) || { totalPrize: '', awards: [] }
 </script>
 
 <style scoped>
 .contest {
   min-height: 100vh;
+  background:
+    linear-gradient(180deg, #fff 0%, #fcf7f8 28%, #fff 72%);
 }
 
 .wrap {
-  max-width: 920px;
+  width: min(1440px, calc(100vw - 32px));
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 16px;
 }
 
 /* ===== Hero ===== */
 .hero {
+  position: relative;
+  overflow: hidden;
   padding: clamp(80px, 14vh, 140px) 0 64px;
   background:
-    radial-gradient(80% 60% at 50% 0%, rgba(186,12,47,.06), transparent 70%),
-    var(--gray-50);
-  border-bottom: 1px solid var(--border);
+    radial-gradient(48% 42% at 12% 8%, rgba(186,12,47,.18), transparent 72%),
+    radial-gradient(36% 30% at 88% 18%, rgba(122,10,34,.12), transparent 78%),
+    linear-gradient(180deg, #fff7f8 0%, #faf6f7 100%);
+  border-bottom: 1px solid rgba(186,12,47,.12);
+}
+.hero::before,
+.hero::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+}
+.hero::before {
+  top: -140px;
+  right: -40px;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(186,12,47,.16) 0%, rgba(186,12,47,0) 70%);
+}
+.hero::after {
+  left: -120px;
+  bottom: -160px;
+  width: 360px;
+  height: 360px;
+  background: radial-gradient(circle, rgba(122,10,34,.12) 0%, rgba(122,10,34,0) 72%);
 }
 .hero__eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: .2em;
+  letter-spacing: .16em;
   color: var(--brand);
   text-transform: uppercase;
+  background: rgba(186,12,47,.08);
+  border: 1px solid rgba(186,12,47,.12);
+  box-shadow: 0 8px 20px rgba(186,12,47,.06);
 }
 .hero__eyebrow::before {
   content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--brand);
 }
 .hero__title {
   margin-top: 14px;
+  max-width: 12ch;
   font-size: clamp(32px, 4.6vw, 52px);
   font-weight: 800;
   line-height: 1.15;
@@ -225,7 +242,7 @@ const awardFor = (id) => awardDetails.find(a => a.trackId === id) || { totalPriz
   margin-top: 44px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 16px;
 }
 @media (max-width: 820px) {
   .tabs { grid-template-columns: 1fr; }
@@ -233,9 +250,9 @@ const awardFor = (id) => awardDetails.find(a => a.trackId === id) || { totalPriz
 .tab {
   text-align: left;
   padding: 22px 22px 24px;
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,.98) 0%, rgba(252,247,248,.96) 100%);
+  border: 1px solid rgba(186,12,47,.10);
+  border-radius: 18px;
   cursor: pointer;
   transition: transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s, border-color .25s, background .25s;
   position: relative;
@@ -249,22 +266,37 @@ const awardFor = (id) => awardDetails.find(a => a.trackId === id) || { totalPriz
   content: "";
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 3px;
-  background: var(--c);
+  height: 4px;
+  background: linear-gradient(90deg, var(--brand), color-mix(in srgb, var(--c) 55%, white));
   opacity: 0;
   transition: opacity .25s;
 }
+.tab::after {
+  content: "";
+  position: absolute;
+  top: -18px;
+  right: -18px;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(186,12,47,.12) 0%, rgba(186,12,47,0) 72%);
+  opacity: 0;
+  transition: opacity .25s ease;
+}
 .tab:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(0,0,0,.06);
-  border-color: color-mix(in srgb, var(--c) 28%, var(--border));
+  box-shadow: 0 16px 32px rgba(122,10,34,.10);
+  border-color: rgba(186,12,47,.24);
 }
 .tab--active {
-  border-color: var(--c);
-  background: color-mix(in srgb, var(--c) 5%, white);
-  box-shadow: 0 12px 28px color-mix(in srgb, var(--c) 14%, transparent);
+  border-color: rgba(186,12,47,.28);
+  background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(251,241,243,1) 100%);
+  box-shadow: 0 18px 36px rgba(122,10,34,.12);
 }
-.tab--active::before { opacity: 1; }
+.tab--active::before,
+.tab:hover::before,
+.tab--active::after,
+.tab:hover::after { opacity: 1; }
 
 .tab__num {
   font-family: "SF Mono", ui-monospace, monospace;
@@ -293,13 +325,21 @@ const awardFor = (id) => awardDetails.find(a => a.trackId === id) || { totalPriz
 }
 
 /* Header */
-.t-head { margin-bottom: 56px; }
+.t-head {
+  margin-bottom: 56px;
+  padding: 28px 30px 30px;
+  border-radius: 22px;
+  background:
+    linear-gradient(135deg, rgba(186,12,47,.08) 0%, rgba(186,12,47,.02) 42%, rgba(255,255,255,.98) 100%);
+  border: 1px solid rgba(186,12,47,.12);
+  box-shadow: 0 16px 36px rgba(122,10,34,.08);
+}
 .t-head__num {
   font-family: "SF Mono", ui-monospace, monospace;
   font-size: 12px;
   letter-spacing: .2em;
   font-weight: 700;
-  color: var(--c);
+  color: var(--brand);
 }
 .t-head__title {
   margin-top: 14px;
@@ -315,7 +355,7 @@ const awardFor = (id) => awardDetails.find(a => a.trackId === id) || { totalPriz
   width: 56px;
   height: 3px;
   margin-top: 18px;
-  background: var(--c);
+  background: linear-gradient(90deg, var(--brand), rgba(186,12,47,.22));
   border-radius: 2px;
 }
 .t-head__meta {
@@ -329,35 +369,51 @@ const awardFor = (id) => awardDetails.find(a => a.trackId === id) || { totalPriz
   font-weight: 600;
   padding: 6px 12px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--c) 8%, white);
-  color: var(--c);
-  border: 1px solid color-mix(in srgb, var(--c) 22%, white);
+  background: rgba(186,12,47,.08);
+  color: var(--brand);
+  border: 1px solid rgba(186,12,47,.16);
 }
 
 /* Block */
 .block {
   margin-top: 48px;
-  padding: 28px 30px;
-  background: var(--gray-50);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  box-shadow: 0 1px 3px rgba(0,0,0,.03);
+  padding: 30px 32px 32px;
+  background: #fff;
+  border: 1px solid rgba(186,12,47,.10);
+  border-radius: 18px;
+  box-shadow: 0 14px 32px rgba(122,10,34,.06);
+  position: relative;
+  overflow: hidden;
+}
+.block::before {
+  content: "";
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(186,12,47,.10) 0%, rgba(186,12,47,0) 72%);
+  pointer-events: none;
 }
 
 .block__title {
+  margin: -30px -32px 24px;
+  padding: 16px 24px;
   font-size: 18px;
   font-weight: 700;
-  color: var(--gray-900);
+  color: #fff;
   letter-spacing: -.005em;
   display: flex;
   align-items: baseline;
   gap: 12px;
+  background: linear-gradient(135deg, #8f1823 0%, #ba0c2f 58%, #7a0a22 100%);
 }
 .block__title::before {
   content: "";
   display: inline-block;
   width: 4px; height: 18px;
-  background: var(--c);
+  background: rgba(255,255,255,.92);
   border-radius: 2px;
   transform: translateY(2px);
 }
@@ -373,15 +429,22 @@ const awardFor = (id) => awardDetails.find(a => a.trackId === id) || { totalPriz
   color: var(--gray-700);
   font-size: 15px;
   line-height: 1.85;
+  max-width: 78ch;
 }
 .block__p + .block__p { margin-top: 12px; }
 
 .sub-title {
   margin-top: 22px;
-  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 13px;
   font-weight: 700;
-  color: var(--gray-900);
+  color: var(--brand);
   letter-spacing: .04em;
+  background: rgba(186,12,47,.08);
+  border: 1px solid rgba(186,12,47,.14);
 }
 
 .bullets {
@@ -394,7 +457,7 @@ const awardFor = (id) => awardDetails.find(a => a.trackId === id) || { totalPriz
   color: var(--gray-700);
   font-size: 14.5px;
   line-height: 1.75;
-  border-bottom: 1px dashed var(--border);
+  border-bottom: 1px dashed rgba(186,12,47,.14);
 }
 .bullets li:last-child { border-bottom: none; }
 .bullets li::before {
@@ -415,9 +478,10 @@ const awardFor = (id) => awardDetails.find(a => a.trackId === id) || { totalPriz
 .phase {
   padding: 22px 24px;
   border-radius: 12px;
-  border: 1px solid var(--border);
-  background: #fff;
-  border-left: 4px solid var(--c);
+  border: 1px solid rgba(186,12,47,.12);
+  background: linear-gradient(180deg, rgba(186,12,47,.03) 0%, #fff 100%);
+  border-left: 4px solid var(--brand);
+  box-shadow: 0 8px 18px rgba(122,10,34,.05);
 }
 
 .phase__head {
@@ -429,7 +493,7 @@ const awardFor = (id) => awardDetails.find(a => a.trackId === id) || { totalPriz
   font-family: "SF Mono", ui-monospace, monospace;
   font-size: 13px;
   font-weight: 700;
-  color: var(--c);
+  color: var(--brand);
   letter-spacing: .12em;
 }
 .phase__name {
@@ -454,11 +518,11 @@ const awardFor = (id) => awardDetails.find(a => a.trackId === id) || { totalPriz
 .crit-tag {
   padding: 8px 16px;
   border-radius: 8px;
-  background: color-mix(in srgb, var(--c) 6%, white);
-  color: var(--c);
+  background: rgba(186,12,47,.08);
+  color: var(--brand);
   font-size: 13.5px;
   font-weight: 600;
-  border: 1px solid color-mix(in srgb, var(--c) 18%, white);
+  border: 1px solid rgba(186,12,47,.14);
 }
 
 .crit-grid {
@@ -472,16 +536,17 @@ const awardFor = (id) => awardDetails.find(a => a.trackId === id) || { totalPriz
 }
 .crit-card {
   padding: 20px 22px;
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--c) 4%, white);
-  border: 1px solid color-mix(in srgb, var(--c) 14%, white);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(186,12,47,.05) 0%, #fff 100%);
+  border: 1px solid rgba(186,12,47,.12);
   position: relative;
+  box-shadow: 0 10px 24px rgba(122,10,34,.05);
 }
 .crit-card__num {
   font-family: "SF Mono", ui-monospace, monospace;
   font-size: 11px;
   font-weight: 700;
-  color: var(--c);
+  color: var(--brand);
   letter-spacing: .14em;
 }
 .crit-card__title {
@@ -509,18 +574,18 @@ const awardFor = (id) => awardDetails.find(a => a.trackId === id) || { totalPriz
 }
 .type-card {
   padding: 24px 26px;
-  border-radius: 12px;
-  background: #fff;
-  border: 1px solid var(--border);
-  border-top: 3px solid var(--c);
-  box-shadow: 0 2px 6px rgba(0,0,0,.04);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(186,12,47,.04) 0%, #fff 100%);
+  border: 1px solid rgba(186,12,47,.12);
+  border-top: 4px solid var(--brand);
+  box-shadow: 0 10px 24px rgba(122,10,34,.05);
 }
 .type-card__tag {
   font-family: "SF Mono", ui-monospace, monospace;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: .14em;
-  color: var(--c);
+  color: var(--brand);
 }
 .type-card__title {
   margin-top: 8px;
@@ -540,7 +605,7 @@ const awardFor = (id) => awardDetails.find(a => a.trackId === id) || { totalPriz
   font-size: 12px;
   font-weight: 700;
   letter-spacing: .04em;
-  color: var(--gray-500);
+  color: var(--brand-dark);
   text-transform: uppercase;
 }
 
@@ -587,9 +652,18 @@ const awardFor = (id) => awardDetails.find(a => a.trackId === id) || { totalPriz
 /* Back to top */
 @media (max-width: 720px) {
   .track { padding: 56px 0 72px; }
+  .t-head { padding: 22px 20px 24px; }
   .block { padding: 22px 20px; }
+  .block__title {
+    margin: -22px -20px 20px;
+    padding: 14px 18px;
+  }
   .phase { padding: 18px 18px; }
   .hero { padding: 80px 0 48px; }
   .hero__lead { font-size: 15px; }
+  .wrap {
+    width: auto;
+    padding: 0 14px;
+  }
 }
 </style>
